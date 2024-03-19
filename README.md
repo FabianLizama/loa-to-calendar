@@ -6,7 +6,7 @@ Loa To Calendar
 <br>
 </p>
 <span>
-Iba a agregar mi horario a <a href="https://calendar.google.com/">Google Calendar</a> pero me dio paja hacerlo a mano
+Iba a agregar mi horario a <a href="https://calendar.google.com/">Google Calendar</a> pero me dio paja hacerlo a mano, así que gasté el triple del tiempo que me hubiera demorado haciéndolo para automatizarlo.
 </span>
 
 
