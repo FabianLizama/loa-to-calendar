@@ -22,6 +22,7 @@ $ cd loa-to-calendar
 $ pip install -r requirements.txt
 ```
 ## Uso
+Primero es necesario descargar el horario del loa y ponerlo en el mismo directorio del programa, luego ejecutar el siguiente comando:
 ```console
 $ python main.py ruta_al_horario.pdf
 ```
