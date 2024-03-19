@@ -5,6 +5,9 @@ Loa To Calendar
 <span>Herramienta para exportar el horario del loa a un archivo .ics</span>
 <br>
 </p>
+<span>
+Iba a agregar mi horario a <a href="https://calendar.google.com/">Google Calendar</a> pero me dio paja hacerlo a mano
+</span>
 
 
 ## Instalación
