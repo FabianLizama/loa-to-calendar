@@ -5,6 +5,7 @@ from datetime import date, time, datetime, timedelta  # librería para manejo de
 from zoneinfo import ZoneInfo  # librería para manejo de zonas horarias
 from dateutil.rrule import *
 import tzdata  # librería con las zonas horarias
+import sys
 
 # Inicio y fin del semestre actual (2024-1)
 INICIO_SEM = date(2024, 3, 18)
@@ -31,8 +32,8 @@ DIAS = {"L": MO, "M": TU, "W": WE, "J": TH, "V": FR, "S": SA}
 
 
 def leer_pdf(nombre):
-    # Lee el pdf y lo transforma a texto
     try:
+        # Lee el pdf y lo transforma a texto
         reader = PdfReader(nombre)
         number_of_pages = len(reader.pages)
         page = reader.pages[0]
@@ -40,38 +41,42 @@ def leer_pdf(nombre):
         text = text.split("\n")
         return text
     except:
-        print("Pdf incorrecto")
-        return
+        print("Error al abrir el archivo pdf")
+        return 1
 
 
 def proces_pdf(text):
-    # Recolecta la información necesaria para el funcionamiento del programa
-    # En la linea 11 empiezan a salir los ramos
-    rut = text[0]
-    # Terminan de salir ramos cuando la linea que sigue es tres veces el rut
-    i = 11
-    asignaturas = []
-    linea = text[i]
-    while linea != rut * 3:
-        linea = linea[1:]  # Eliminamos el indice de la lista
-        linea = linea.split(" ")
-        tipo = linea.pop()[:-1]
-        horas = linea.pop()
-        seccion = linea.pop()
-        codigo = linea.pop(0)
-        nombre = " ".join(linea).title()
-        asignaturas.append(
-            {
-                "codigo": codigo,
-                "tipo": tipo,
-                "horas": format_horas(horas),
-                "seccion": seccion,
-                "nombre": nombre,
-            }
-        )
-        i += 1
+    try:
+        # Recolecta la información necesaria para el funcionamiento del programa
+        # En la linea 11 empiezan a salir los ramos
+        rut = text[0]
+        # Terminan de salir ramos cuando la linea que sigue es tres veces el rut
+        i = 11
+        asignaturas = []
         linea = text[i]
-    return asignaturas
+        while linea != rut * 3:
+            linea = linea[1:]  # Eliminamos el indice de la lista
+            linea = linea.split(" ")
+            tipo = linea.pop()[:-1]
+            horas = linea.pop()
+            seccion = linea.pop()
+            codigo = linea.pop(0)
+            nombre = " ".join(linea).title()
+            asignaturas.append(
+                {
+                    "codigo": codigo,
+                    "tipo": tipo,
+                    "horas": format_horas(horas),
+                    "seccion": seccion,
+                    "nombre": nombre,
+                }
+            )
+            i += 1
+            linea = text[i]
+        return asignaturas
+    except:
+        print("Pdf ingresado inválido")
+        return 1
 
 
 def format_horas(horas):
@@ -134,18 +139,27 @@ def crear_calendario(horario):
         calendario = crear_evento(ramo, calendario)
     return calendario
 
+def crear_archivo(calendario):
+    try:
+        with open("horario.ics", "w") as f:
+                f.writelines(calendario.serialize_iter())
+        print("Horario exportado exitosamente como horario.ics")
+    except:
+        print("Error al crear el archivo")
+        return 1
+
 def main():
-	pdf = leer_pdf("horario.pdf")
-
-	horario = proces_pdf(pdf)
-
-	calendario = crear_calendario(horario)
-	try:
-		with open("horario.ics", "w") as f:
-		    f.writelines(calendario.serialize_iter())
-		print("Horario exportado exitosamente como horario.ics")
-	except:
-		print("Error al crear el archivo .ics")
+    if len(sys.argv) == 2:
+        pdf = leer_pdf(sys.argv[1])
+        if pdf == 1:
+            return
+        horario = proces_pdf(pdf)
+        if horario == 1:
+            return
+        calendario = crear_calendario(horario)
+        crear_archivo(calendario)
+    else:
+        print("Opción inválida")
 
 if __name__ == "__main__":
 	main()
