@@ -158,6 +158,8 @@ def main():
             return
         calendario = crear_calendario(horario)
         crear_archivo(calendario)
+        for ramo in horario:
+            print(ramo)
     else:
         print("Opción inválida")
 
