@@ -83,8 +83,7 @@ def main():
                 "nombre": extraer_nombre(pdf),
                 "horarios": ordenar_lista(horarios_ocupados)
             })
+            print(consolidado_horarios)
 
-        # Se ordena la lista
-        print(consolidado_horarios)
 if __name__ == "__main__":
 	main()
