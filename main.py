@@ -40,12 +40,18 @@ def leer_pdf(nombre):
         text = page.extract_text()
         text = text.split("\n")
         return text
-    except:
-        print("Error al abrir el archivo pdf")
+    except FileNotFoundError as e:
+        print(f"Error: El archivo no fue encontrado. Detalles: {e}")
+        return 1
+    except PermissionError as e:
+        print(f"Error: No tienes permiso para acceder al archivo. Detalles: {e}")
+        return 1
+    except Exception as e:
+        print(f"Error al abrir o procesar el archivo PDF. Detalles: {e}")
         return 1
 
 
-def proces_pdf(text):
+def proces_pdf(text, nombre_archivo):
     try:
         # Recolecta la información necesaria para el funcionamiento del programa
         # En la linea 11 empiezan a salir los ramos
@@ -74,8 +80,9 @@ def proces_pdf(text):
             i += 1
             linea = text[i]
         return asignaturas
-    except:
-        print("Pdf ingresado inválido")
+
+    except Exception as e:
+        print(f"Error procesando el archivo '{nombre_archivo}': {e}")
         return 1
 
 
@@ -153,7 +160,7 @@ def main():
         pdf = leer_pdf(sys.argv[1])
         if pdf == 1:
             return
-        horario = proces_pdf(pdf)
+        horario = proces_pdf(pdf, sys.argv[1])
         if horario == 1:
             return
         calendario = crear_calendario(horario)
