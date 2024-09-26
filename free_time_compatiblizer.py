@@ -1,5 +1,8 @@
 from main import *
 import os
+import numpy as np
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 PRIORIDAD_LETRAS = {'L': 1, 'M': 2, 'W': 3, 'J': 4, 'V': 5, 'S': 6}
 
@@ -18,7 +21,6 @@ def extraer_nombre(datos):
 def extraer_bloques(horario):
     lista = []
     for ramo in horario:
-        print("Ramo:", ramo)
         lista.append(ramo['horas'])
     return lista
 
@@ -31,6 +33,30 @@ def clave_orden(elemento):
 def ordenar_lista(lista):
     return sorted(lista, key=clave_orden)
 
+def generar_mapa(horarios):
+    dias = ['L', 'M', 'W', 'J', 'V']
+    numeros = list(range(1, 8))
+    matriz_horarios = np.zeros((7, 5))
+    
+    for persona in horarios:
+        for horario in persona['horarios']:
+            dia = horario[0]  # Día de la semana
+            numero = int(horario[1])  # Número del horario
+            if dia in dias and numero in numeros:
+                columna = dias.index(dia)
+                fila = numero - 1
+                matriz_horarios[fila, columna] += 1
+    
+    # Crear el heatmap usando seaborn
+    plt.figure(figsize=(8, 6))
+    sns.heatmap(matriz_horarios, annot=True, cmap='coolwarm', xticklabels=dias, yticklabels=numeros, cbar=True)
+    plt.xlabel('Día')
+    plt.ylabel('Bloque')
+    plt.title('Mapa de calor de horarios')
+    plt.tight_layout()
+    plt.gca().xaxis.tick_top()
+    plt.gca().xaxis.set_label_position('top')
+    plt.show()
 
 def main():
     consolidado_horarios = []
@@ -83,7 +109,9 @@ def main():
                 "nombre": extraer_nombre(pdf),
                 "horarios": ordenar_lista(horarios_ocupados)
             })
-            print(consolidado_horarios)
+        for persona in consolidado_horarios:
+            print(persona)
+        generar_mapa(consolidado_horarios)
 
 if __name__ == "__main__":
 	main()
