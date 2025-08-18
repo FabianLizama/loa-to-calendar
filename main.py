@@ -8,8 +8,8 @@ import tzdata  # librería con las zonas horarias
 import sys
 
 # Inicio y fin del semestre actual (2024-1)
-INICIO_SEM = date(2024, 3, 18)
-FIN_SEM = date(2024, 7, 20)
+INICIO_SEM = date(2025, 8, 18)
+FIN_SEM = date(2025, 12, 20)
 
 # Si llegan a cambiar la duración de los bloques como en el semestre 2022-2
 # Basta con cambiar la duración aquí
