@@ -1,10 +1,11 @@
-from PyPDF2 import PdfReader  # librería para leer pdfs
+from pypdf import PdfReader  # librería para leer pdfs
 from ics import Calendar, Event  # librería para manejo de archivos .ics
 from ics.grammar.parse import ContentLine
 from datetime import date, time, datetime, timedelta  # librería para manejo de tiempo
 from zoneinfo import ZoneInfo  # librería para manejo de zonas horarias
 from dateutil.rrule import *
 import tzdata  # librería con las zonas horarias
+import re
 import sys
 
 # Inicio y fin del semestre actual (2024-1)
@@ -45,34 +46,34 @@ def leer_pdf(nombre):
         return 1
 
 
+# Línea de un ramo en el pdf: índice, código, nombre, sección,
+# horario (ej: M2J2V2), tipo y un número final que se ignora
+RAMO_RE = re.compile(
+    r"^(\d+)\s+(\d{5}-[A-Z0-9])\s+(.+?)\s+([A-Z]-\d+)\s+((?:[LMWJVS]\d)+)([A-Z]+)(?:\s+(\d+))?$"
+)
+
+
 def proces_pdf(text):
     try:
         # Recolecta la información necesaria para el funcionamiento del programa
-        # En la linea 11 empiezan a salir los ramos
-        rut = text[0]
-        # Terminan de salir ramos cuando la linea que sigue es tres veces el rut
-        i = 11
+        # Cada ramo es una línea que calza con el patrón, el resto se ignora
         asignaturas = []
-        linea = text[i]
-        while linea != rut * 3:
-            linea = linea[1:]  # Eliminamos el indice de la lista
-            linea = linea.split(" ")
-            tipo = linea.pop()[:-1]
-            horas = linea.pop()
-            seccion = linea.pop()
-            codigo = linea.pop(0)
-            nombre = " ".join(linea).title()
+        for linea in text:
+            ramo = RAMO_RE.match(linea.strip())
+            if ramo is None:
+                continue
             asignaturas.append(
                 {
-                    "codigo": codigo,
-                    "tipo": tipo,
-                    "horas": format_horas(horas),
-                    "seccion": seccion,
-                    "nombre": nombre,
+                    "codigo": ramo.group(2),
+                    "tipo": ramo.group(6),
+                    "horas": format_horas(ramo.group(5)),
+                    "seccion": ramo.group(4),
+                    "nombre": ramo.group(3).title(),
                 }
             )
-            i += 1
-            linea = text[i]
+        if not asignaturas:
+            print("Pdf ingresado inválido")
+            return 1
         return asignaturas
     except:
         print("Pdf ingresado inválido")
